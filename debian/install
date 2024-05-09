@@ -1,0 +1,19 @@
+# usr/bin/$gnu_type-
+# These lines are parsed by debian/links.
+usr/bin/*-cpp
+usr/bin/*-gcc
+usr/bin/*-gcc-ar
+usr/bin/*-gcc-nm
+usr/bin/*-gcc-ranlib
+
+# usr/lib/gcc/$gnu_type/$gcc_version_major/
+usr/lib/gcc/*/*/include/*.h
+usr/lib/gcc/*/*/libgcc.a
+usr/lib/gcc/*/*/libgcov.a
+
+# usr/libexec/gcc/$gnu_type/$gcc_version_major/
+usr/libexec/gcc/*/*/cc1
+usr/libexec/gcc/*/*/collect2
+usr/libexec/gcc/*/*/liblto_plugin.so
+usr/libexec/gcc/*/*/lto-wrapper
+usr/libexec/gcc/*/*/lto1

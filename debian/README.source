@@ -1,0 +1,6 @@
+When the package rebuilds successfully against latest gcc-MAJOR-source,
+with MAJOR unchanged,
+feel free to proceed to a Non-Maintainer Upload without prior
+permission.  For any other change, please follow the usual procedure.
+
+ -- Nicolas Boulenguez <nicolas@debian.org>, Sun,  6 Jun 2021 19:16:48 +0200

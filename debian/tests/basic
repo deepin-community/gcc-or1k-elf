@@ -1,0 +1,13 @@
+#!/bin/sh
+set -C -e -f -u
+
+gnu_type=$(sed -n 's/^gnu_type := //p' debian/rules)
+cd "$AUTOPKGTEST_TMP"
+
+cat > foo.c <<EOF
+int add (int a, int b)
+{
+  return a+b;
+}
+EOF
+$gnu_type-gcc -nostdlib foo.c

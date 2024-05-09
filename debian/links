@@ -1,0 +1,24 @@
+#!/bin/sh
+set -C -e -f -u
+
+gnu_type=or1k-elf
+deb_suffix=$(echo $gnu_type | tr _ -)
+gcc_version_major=$(sed '/^ gcc-\(.*\)-source,$$/ ! d; s//\1/; q' debian/control)
+gcc_libdir=usr/lib/gcc/$gnu_type/$gcc_version_major
+mandir=usr/share/man/man1
+
+# Link the binutils tools from the GCC library directory.
+dpkg --listfiles binutils-$deb_suffix \
+    | sed -n "s%^/usr/$gnu_type/bin/%%p" \
+    | while read tool
+do
+    echo usr/bin/$gnu_type-$tool $gcc_libdir/$tool
+done
+
+# For each installed executable, provide a manual page as a symbolic
+# link to the one from gcc-common.
+sed -n "s%^usr/bin/\*-%%p" debian/install \
+    | while read tool
+do
+    echo $mandir/$tool.1.gz $mandir/$gnu_type-$tool.1.gz
+done

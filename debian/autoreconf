@@ -1,0 +1,15 @@
+# Order matters:
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=29482#c9
+
+src
+src/fixincludes
+src/gcc
+src/intl
+src/libbacktrace
+src/libcpp
+src/libdecnumber
+src/libgcc
+# src/libiberty is broken with gcc-{11,12} autoreconf2.69
+src/libquadmath
+src/lto-plugin
+src/libcc1

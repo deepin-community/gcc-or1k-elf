@@ -1,5 +1,69 @@
-template-repository (1.0-1) unstable; urgency=medium
+gcc-or1k-elf (1.0.6) unstable; urgency=medium
 
-  * Initial release
+  * Enable link time optimization on the target again.
 
- -- Tsic404 <liuheng@deepin.org>  Sat, 28 Jan 2023 13:46:49 +0800
+ -- Nicolas Boulenguez <nicolas@debian.org>  Wed, 30 Aug 2023 21:57:46 +0000
+
+gcc-or1k-elf (1.0.5) unstable; urgency=medium
+
+  * Build with gcc-13. Drop applied fix-autoreconf.diff.
+  * Skip post-build tests again.  They take ages for no benefit.
+  * Disable link time optimization on target, else the build consumes Gbytes.
+  * Disable native language support, depend on gcc-*-locales.
+  * Improve the readability of debian/links.
+
+ -- Nicolas Boulenguez <nicolas@debian.org>  Tue, 29 Aug 2023 12:57:01 +0000
+
+gcc-or1k-elf (1.0.4) unstable; urgency=medium
+
+  * Standards-Version: 4.6.2.
+  * Prevent link time optimizations. Closes: #1015414.
+  * Update syntax of lintian overrides.
+
+ -- Nicolas Boulenguez <nicolas@debian.org>  Thu, 22 Dec 2022 17:38:07 +0000
+
+gcc-or1k-elf (1.0.3) unstable; urgency=medium
+
+  [ Joel Stanley ]
+  * Remove strip of libgcc.a and libgcov.a
+
+ -- Nicolas Boulenguez <nicolas@debian.org>  Tue, 31 May 2022 01:59:17 +0200
+
+gcc-or1k-elf (1.0.2) unstable; urgency=medium
+
+  * Remove unused breakout-link lintian override
+  * Really fix permissions for liblto_plugin.so
+  * tests: avoid a duplication of the GNU type
+  * Standards-Version: no change update
+  * copyright: update years, add contributors
+  * rules: allow empty gcc/patches/git-updates.diff
+  * Build with GCC-12
+
+ -- Nicolas Boulenguez <nicolas@debian.org>  Sun, 15 May 2022 18:31:44 +0200
+
+gcc-or1k-elf (1.0.1) unstable; urgency=medium
+
+  * Reupload to unstable.
+
+  [ Nicolas Boulenguez ]
+  * Fix Built-Using with GCC source version instead of binary version.
+  * autoreconf2.69 all modules except libiberty, apparently broken.
+  * Enable post-build checks
+  * Allow the binary package to satisfy Multi-Arch: foreign dependencies.
+  * Run update_autotools_config (after source extraction...).
+  * Fix DESTDIR when build path contains space characters.
+  * Fix dh_strip when GNU type contains underscore characters.
+  * Split debian/rules in short debhelper configuration files.
+  * Minor style issues.
+  * Rebuild with binutils-2.37 and gcc-11.
+
+  [ Jonas Smedegaard ]
+  * fix my email address in Uploaders field
+
+ -- Jonas Smedegaard <dr@jones.dk>  Mon, 06 Sep 2021 18:12:37 +0200
+
+gcc-or1k-elf (1) experimental; urgency=medium
+
+  * Initial release. Closes: #982893.
+
+ -- Nicolas Boulenguez <nicolas@debian.org>  Sun, 10 Jan 2021 12:12:28 +0000
