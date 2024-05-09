@@ -1,4 +1,99 @@
 #!/usr/bin/make -f
 
+# https://wiki.debian.org/PackagingLessCommonBinutilsTargets
+
+include /usr/share/dpkg/buildopts.mk
+include /usr/share/dpkg/pkg-info.mk
+
+# In gcc-10&11&13, libcpp/expr.c contains format errors.
+# lto: https://bugs.debian.org/1015414
+export DEB_BUILD_MAINT_OPTIONS := hardening=+all,-format optimize=-lto
+
+gnu_type := or1k-elf
+# Not deducible from package name because of possible underscore characters.
+gnu_type_in_deb_name = $(subst _,-,$(gnu_type))
+package = gcc-$(gnu_type_in_deb_name)
+tmpdir = debian/$(package)
+
+gcc-version-major := $(shell sed '/^ gcc-\(.*\)-source,$$/!d;s//\1/;q' debian/control)
+# The Debian packaging calls this BV.
+
+gcc-version != dpkg-query -Wf'$${Version}' gcc-$(gcc-version-major)-source
+
+# https://gcc.gnu.org/install/configure.html recommends out-of-tree builds.
 %:
 	dh $@
+
+execute_before_dh_update_autotools_config: src
+tar_dir = /usr/src/gcc-$(gcc-version-major)
+src:
+	tar -xf $(tar_dir)/gcc-*.tar.xz --transform='s|[^/]*|src|'
+  # git-updates.diff always exists, but may contain no diff chunk.
+	if grep -q '^---' $(tar_dir)/patches/git-updates.diff; then \
+	  patch -p1 < $(tar_dir)/patches/git-updates.diff; \
+	fi
+  # Apply patches, either local or from $(tar_dir)/patches/, with
+  # 'patch -p1 < PATCH':
+	patch -p1 < $(tar_dir)/patches/gcc-gfdl-build.diff
+
+# _GCC_AUTOCONF_VERSION_CHECK in config/override.m4 requires 2.69.
+override_dh_autoreconf:
+	dh_autoreconf autoreconf2.69 -- -f -i -v `grep -v \# debian/autoreconf`
+
+# libssp: libssp requires glibc
+# Install to the same path hierarchy than other GCCs: neither
+# multiarch components nor GCC minor versions.
+
+# Translations would duplicate the suggested gcc-locales.
+configure_options += --disable-nls
+
+override_dh_auto_configure:
+  # Imitate dh_auto_configure -- $(confargs), but without
+  # --runstatedir as long as libiberty/configure cannot be refreshed.
+	install -d bld
+	cd bld && ../src/configure --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --includedir=/usr/include --mandir=/usr/share/man --infodir=/usr/share/info --sysconfdir=/etc --localstatedir=/var --disable-option-checking --disable-silent-rules --libdir=/usr/lib/$(DEB_HOST_GNU_TYPE) --disable-maintainer-mode --disable-dependency-tracking \
+	  --target=$(gnu_type) \
+	  --disable-shared \
+	  --disable-multilib \
+	  --disable-bootstrap \
+	  --enable-languages=c \
+	  --disable-libssp \
+	  --libdir=\$${prefix}/lib \
+	  --with-gcc-major-version-only \
+	  --without-included-gettext \
+	  --with-pkgversion='GCC $(gcc-version) Debian $(DEB_VERSION)' \
+	  $(configure_options) \
+	  --with-system-zlib
+
+# Prevent dh_auto_{build,test,install} from parsing Makefile, see
+# https://gcc.gnu.org/legacy-ml/gcc/2013-04/msg00171.html
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100933
+
+override_dh_auto_build:
+	cd bld && $(MAKE) $(addprefix -j,$(DEB_BUILD_OPTION_PARALLEL))
+
+override_dh_auto_test:
+# Skip tests because they consume a lot of time and space, their
+# results are ignored, and most are redundant with native builds.
+# 	cd bld && $(MAKE) check
+
+# Even if building one package, install in two steps and display
+# explicit install/missing lists.
+override_dh_auto_install:
+	cd bld && $(MAKE) install DESTDIR='$(CURDIR)/debian/tmp' AM_UPDATE_INFO_DIR=no
+
+# The archive may be stripped, but
+# * not for the or1k-elf target, see commit d4e32cd0
+# * that would be $(gnu_type)-strip, not $(DEB_HOST_GNU_TYPE)-strip
+override_dh_strip:
+	dh_strip --exclude=.a
+# dh_fixperms would be more consistent, but comes before dh_strip.
+	chmod 644 $(tmpdir)/usr/libexec/gcc/$(gnu_type)/$(gcc-version-major)/liblto_plugin.so
+
+# The private shared library needs no ldconfig trigger.
+override_dh_makeshlibs:
+	dh_makeshlibs --no-scripts
+
+override_dh_gencontrol:
+	dh_gencontrol -- -v${gcc-version}+$(DEB_VERSION) \
+	  -Vgcc-version-major=$(gcc-version-major)

@@ -1,0 +1,25 @@
+# usr/bin/$gnu_type-gcc-$gcc_version_major
+usr/bin/*-gcc-*
+usr/bin/*-gcov
+usr/bin/*-gcov-dump
+usr/bin/*-gcov-tool
+usr/bin/*-lto-dump
+
+# This path should be made multiarch-compliant if ever installed.
+usr/lib/libcc1.*
+
+# usr/lib/gcc/$gnu_type/$gcc_version_major/
+usr/lib/gcc/*/*/*.o
+usr/lib/gcc/*/*/include-fixed/README
+usr/lib/gcc/*/*/install-tools/
+usr/lib/gcc/*/*/plugin/
+
+# usr/libexec/gcc/$gnu_type/$gcc_version_major/
+usr/libexec/gcc/*/*/g++-mapper-server
+usr/libexec/gcc/*/*/install-tools/
+usr/libexec/gcc/*/*/liblto_plugin.la
+usr/libexec/gcc/*/*/plugin/
+
+# Shared data are provided by the gcc-common dependency.
+usr/share/info/
+usr/share/man/

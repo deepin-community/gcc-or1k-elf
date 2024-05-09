@@ -1,0 +1,3 @@
+# Private library only used by executables from this package.
+# usr/libexec/gcc/$gnu_type/$gcc_version_major/liblto_plugin.so.
+exit-in-shared-library [usr/libexec/gcc/*/*/liblto_plugin.so]
